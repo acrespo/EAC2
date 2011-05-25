@@ -217,6 +217,8 @@ plot(1:size(recorrido1)(2), recorrido1)
 plot(recorrido2(1,:), recorrido2(2,:))
 plot3(recorrido3(1,:), recorrido3(2,:), recorrido3(3,:))
 \end{lstlisting}
+\newpage
+
 Este es el c\'odigo en C hace $ITERATIONS$ simulaciones de caminatas aleatorias de dimensi\'on $dim$ con un m\'aximo de pasos
 $maxPasos$.
 \begin{lstlisting}
@@ -334,7 +336,7 @@ for i=1:size(s)(1)
 	end
 end
 
-printf("De 10000, sólo %d volvieron al inicio\n", size(v)(2));
+printf("De 10000, solo %d volvieron al inicio\n", size(v)(2));
 printf("Promedio de pasos necesarios: %f\n", sum(v)/size(v)(2));
 
 bar(hist(v, [1, 5, 25, 625, 10000]))
