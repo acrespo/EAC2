@@ -110,13 +110,13 @@ Algunas referencias de recomendable consulta para poder entender algo de lo que 
 \newpage
 
 \section{Punto A} 
-Utilizando el c\'odigo del ap\'endice XXXXXXXXX (con dim = 1), para la caminata aleatoria 1D, y considerando un n\'umero de pasos igual a 10000 y 
-de simulaciones igual a 10000,los resultados arrojados fueron:
+Utilizando el c\'odigo del ap\'endice \ref{CodeC} (con dim = 1), para la caminata aleatoria 1D, y considerando un n\'umero de pasos igual a 10000 y 
+de simulaciones igual a 10000, los resultados obtenidos fueron:
 \\
 \\  Probabilidad de la \text{vuelta a casa}: 0.9914.
 \\  Promedio pasos hasta la vuelta: 75.55.
 \\
-\\ A continuaci\'on observamos el histograma para el n\'umero de pasos. En \'el se puede observar la cantidad de simulaciones que 
+\\ A continuaci\'on se muestra el histograma para el n\'umero de pasos. En \'el se puede observar la cantidad de simulaciones que 
 lograron volver exitosamente para cada grupo de n\'umero de pasos.
 \begin{center}
   \begin{figure}[H]
@@ -124,7 +124,7 @@ lograron volver exitosamente para cada grupo de n\'umero de pasos.
     \caption{Histograma}
   \end{figure}
 \end{center}
-En la siguiente figura, se puede ver la trayectoria de una de las caminatas aleatorias que logro exitosamente volver a casa.
+En la siguiente figura, se puede ver la trayectoria de una de las caminatas aleatorias que logr\'o exitosamente volver al origen.
 \begin{center}
   \begin{figure}[H]
   \includegraphics[scale=0.5]{./images/rec1edit.png}
@@ -134,13 +134,13 @@ En la siguiente figura, se puede ver la trayectoria de una de las caminatas alea
 \newpage
 \section{Punto B}
 \subsection*{Caminata aleatoria 2D}
-Para la caminata aleatoria 2D, utilizando de nuevo el mismo c\'odigo del ap\'endice XXXXX (esta vez con dim = 2), y considerando
- un n\'umero de pasos igual a 10000 y de simulaciones igual a 10000,los resultados arrojados fueron:
+Para la caminata aleatoria 2D, utilizando de nuevo el mismo c\'odigo del ap\'endice \ref{CodeC} (esta vez con dim = 2), y considerando
+ un n\'umero de pasos igual a 10000 y de simulaciones igual a 10000, los resultados obtenidos fueron:
 \\
 \\ Probabilidad de la \text{vuelta a casa}: 0.7350.
 \\ Promedio de pasos hasta la vuelta: 366.49.
 \\
-\\ En la siguiente figura, se puede ver la trayectoria de una de las caminatas aleatorias que logro exitosamente volver a casa.
+\\ En la siguiente figura, se puede ver la trayectoria de una de las caminatas aleatorias que logr\'o exitosamente volver a casa.
 \begin{center}
   \begin{figure}[H]
   \includegraphics[scale=0.5]{./images/rec2edit.png}
@@ -148,12 +148,36 @@ Para la caminata aleatoria 2D, utilizando de nuevo el mismo c\'odigo del ap\'end
   \end{figure}
 \end{center} 
 \subsection*{Caminata aleatoria 3D}
-Para la caminata aleatoria 3D si consideramos un n\'umero de pasos igual a 10000 y de simulaciones igual a 10000, el c\'odigo que 
-utilizamos anteriormente para las caminatas aleatorias 1D y 2D, por estar escrito en Octave, tarda un tiempo no despreciable en 
-terminar (aproximadamente entre 4 y 7 horas). Por esta raz\'on, decidimos traducir el c\'odigo al lenguaje C, que se caracteriza
-por ser muy eficiente. Aqu\'i se debe hacer una salvedad, ya que el la funci\'on $rand()$ de C no devuelve numeros aleatorios 
-uniformemente disctribuidos. Para ver como resolvimos este inconveniente dirigirse al ap\'endice XXXXXXXX.
-\\ Hechas estas aclaraciones, los resultados arrojados fueron:
+Para la caminata aleatoria 3D si se considera un n\'umero de pasos igual a 10000 y de simulaciones igual a 10000, el c\'odigo que 
+se escribi\'o para Octave no era suficientemente r\'apido (se estimó que, dado que una caminata de 10000 pasos en la computadora
+utilizada demoraba entre $3$ y $4$ segundos, $10000$ iteraciones demorar\'ian alrededor de 7 horas), se procedi\'o a realizar la
+implementación de la caminata en el lenguaje de programaci\'on C, caracterizado por su eficiencia y el gran control que se tiene 
+sobre las variables y el procesador.
+
+De este modo, se pudieron realizar las siguientes optimizaciones:
+\begin{itemize}
+	\item \textbf{Diferencia entre lenguaje compilado (C) e interpretado (Octave)}. Al ser un lenguaje compilado, la ejecución del 
+	c\'odigo es directa y no hay intermediarios analizando qu\'e es lo que se debe ejecutar. El c\'odigo escrito en Octave no es
+	ejecutable, si no que el int\'erprete Octave hace un an\'alisis en tiempo real de los c\'odigos fuentes de Octave para luego
+	decirle al microprocesador qu\'e operaciones realizar.
+	\item \textbf{Pasaje de resultados por variables globales}. Al declarar las funciones de manera global, se evita el copiado 
+	entre una funci\'on y otra de los resultados obtenidos.
+	\item \textbf{Evitar arreglos de tamaño variable}. Al no utilizar arreglos de tamaño variable, se ahorró tiempo considerable de 
+	ejecución por evitar los pasos de reservar memoria, liberarla, pasos del recolector de basura, entre otros.
+	\item \textbf{Declaraci\'on de funciones \textit{inline}}. Una funci\'on inline en el momento de ser compilada, es insertada
+	autom\'aticamente dentro de la o las funciones que la llamen. Esto ahorra nanosegundos para el procesador, que se evita de 
+	realizar el $"$armado de stack$"$, pero permite al compilador realizar varias optimizaciones que no le son evidentes en otro caso.
+\end{itemize}
+
+Algo que se debe aclarar es que la funci\'on $rand()$ de C no retorna un n\'umero de punto flotante, si no que retorna un entero.
+Debido a esto, se tuvo que realizar un \textit{parche} para obtener un n\'umero aleatorio entre 1 y 3 (ver la funci\'on $realrand()$ en
+\ref{CodeC}), que consistió en saltear dos valores posibles de $rand()$ para que la cantidad de n\'umeros que puedan obtenerse sean
+divisibles por tres (y de este modo, poder hacer $realrand()\%3$). 
+
+La ejecuci\'on de todo el programa en C tom\'o 3 segundos para $10000$ iteraciones en tres dimenciones, y $1$ minuto $24$ segundos para
+$200 000$ (doscientos mil iteraciones), lo cual hubiese sido impracticable utilizando c\'odigo de Octave.
+
+\\ Los resultados obtenidos fueron:
 \\
 \\ Probabilidad de la \text{vuelta a casa}: 0.3328 
 \\ Promedio de pasos hasta la vuelta: 72.81
@@ -169,6 +193,7 @@ uniformemente disctribuidos. Para ver como resolvimos este inconveniente dirigir
 \newpage
 \section{Apéndice: Código}
 Este es el c\'odigo de Octave resuelve una caminata aleatoria de dimensi\'on $dim$ con una cantidad m\'axima de pasos $maxPasos$.
+\label{Code1}
 \begin{lstlisting}
 function M = pasosBorracho(dim, maxPasos)
 
@@ -197,6 +222,7 @@ function M = pasosBorracho(dim, maxPasos)
 		M = zeros(dim, 1);
 	endif
 \end{lstlisting}
+\label{Code2}
 Este c\'odigo genera las caminatas aleatorias para representarlas, teniendo en cuenta que sean lo suficientemente largas como para
 que se puede apreciar. 
 \begin{lstlisting}
@@ -221,7 +247,7 @@ plot(recorrido2(1,:), recorrido2(2,:))
 plot3(recorrido3(1,:), recorrido3(2,:), recorrido3(3,:))
 \end{lstlisting}
 \newpage
-
+\label{CodeC}
 Este es el c\'odigo en C hace $ITERATIONS$ simulaciones de caminatas aleatorias de dimensi\'on $dim$ con un m\'aximo de pasos
 $maxPasos$.
 \begin{lstlisting}
@@ -300,7 +326,8 @@ int main() {
 	}
 }
 \end{lstlisting}
-Este c\'odigo en Python hace TEBEXXX COMPLETE!!!
+\label{CodePy}
+Este c\'odigo en Python hace la transformación de la soluci\'on creada por los programas hechos en C a un vector columna, que Octave puede abrir, con la cantidad de pasos que tomó cada caminata.
 \begin{lstlisting}
 if __name__ == '__main__':
 
@@ -326,6 +353,7 @@ if __name__ == '__main__':
 
 	f.close()
 \end{lstlisting}
+\label{Code3}
 Este fragmento de c\'odigo en Octave hace las simulaciones y estima la probabilidad de la vuelta a casa y el promedio de pasos
 hasta la vuelta.
 \begin{lstlisting}
